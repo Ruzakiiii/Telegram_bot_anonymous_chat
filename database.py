@@ -1,5 +1,10 @@
 import sqlite3
 
+# import psycopg2
+
+
+print("Database opened successfully")
+
 class Database:
     def __init__(self, database_file):
         self.connection = sqlite3.connect(database_file, check_same_thread = False)
@@ -24,7 +29,8 @@ class Database:
                 self.cursor.execute("INSERT INTO `users` (`chat_id`, `gender`) VALUES (?,?)", (chat_id, gender))
                 return True
             else:
-                return False
+                self.cursor.execute(f"UPDATE users SET gender='{gender}' WHERE chat_id={chat_id};")
+                return True
 
     def get_gender(self, chat_id):
         with self.connection:
@@ -34,6 +40,14 @@ class Database:
                     return row[2]
             else:
                 return False
+    
+    def get_users(self, user_id):
+        if user_id in [583411442, 295612129]:
+            with self.connection:
+                o = self.cursor.execute('select chat_id from users')
+                users = [i[0] for i in o]
+
+                return users
     
     def get_gender_chat(self, gender):
         with self.connection:
